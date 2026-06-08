@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Jensen & Jared's Wedding Invitation</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --paper: #fffaf3;
+      --paper-soft: #fffdf8;
+      --ink: #3b3128;
+      --muted: #7a6654;
+      --gold: #c8ad8a;
+      --gold-dark: #8b735b;
+      --shadow: rgba(80, 55, 30, 0.18);
+      --envelope: #ead8c0;
+      --envelope-dark: #d4b894;
+      --envelope-light: #f6e7d2;
+      --seal: #8f3f3f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #fff8ed 0%, #f5eadb 46%, #e8d9c7 100%);
+      font-family: "Cormorant Garamond", Georgia, serif;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    button,
+    input {
+      font-family: "Cormorant Garamond", Georgia, serif;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.8s ease both;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .name-card {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 2.4rem 2rem;
+      background: rgba(255, 250, 243, 0.82);
+      border: 1px solid var(--gold);
+      box-shadow:
+        0 0 0 8px rgba(255, 250, 243, 0.45),
+        0 18px 45px var(--shadow);
+    }
+
+    .small-title {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 1.4rem;
+    }
+
+    .name-card h1 {
+      margin: 0 0 1.2rem;
+      font-weight: normal;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      line-height: 1.25;
+    }
+
+    .name-card p {
+      margin: 0 auto 1.6rem;
+      max-width: 440px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+    }
+
+    input {
+      width: min(340px, 100%);
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--gold);
+      background: var(--paper-soft);
+      font-size: 1rem;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--gold-dark);
+      box-shadow: 0 0 0 3px rgba(158, 132, 101, 0.18);
+    }
+
+    button {
+      padding: 0.85rem 1.15rem;
+      border: 1px solid var(--gold-dark);
+      background: var(--gold-dark);
+      color: var(--paper);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      background: #6f5945;
+      transform: translateY(-1px);
+    }
+
+    .status-message {
+      min-height: 1.4rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .envelope-screen {
+      min-height: 620px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .envelope-screen.active {
+      display: flex;
+    }
+
+    .instruction {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .envelope-wrap {
+      position: relative;
+      width: min(560px, 92vw);
+      height: 360px;
+      cursor: pointer;
+      perspective: 1200px;
+      margin: 0 auto;
+    }
+
+    .envelope {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: min(520px, 90vw);
+      height: 300px;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 22px 30px rgba(80, 55, 30, 0.18));
+      z-index: 4;
+    }
+
+    .envelope-back {
+      position: absolute;
+      inset: 0;
+      background: var(--envelope);
+      border: 1px solid #c9aa84;
+      z-index: 1;
+    }
+
+    .envelope-left,
+    .envelope-right,
+    .envelope-bottom {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .envelope-left {
+      clip-path: polygon(0 0, 52% 52%, 0 100%);
+      background: #dfc59f;
+    }
+
+    .envelope-right {
+      clip-path: polygon(100% 0, 48% 52%, 100% 100%);
+      background: #e6d0ad;
+    }
+
+    .envelope-bottom {
+      clip-path: polygon(0 100%, 50% 45%, 100% 100%);
+      background: var(--envelope-light);
+      border-bottom: 1px solid #c9aa84;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 58%;
+      background: var(--envelope-dark);
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform 1s ease;
+      z-index: 6;
+    }
+
+    .seal {
+      position: absolute;
+      top: 126px;
+      left: 50%;
+      width: 58px;
+      height: 58px;
+      transform: translateX(-50%);
+      background: var(--seal);
+      border-radius: 50%;
+      z-index: 8;
+      box-shadow: inset 0 0 0 3px rgba(255, 250, 243, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff8ed;
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      transition: opacity 0.5s ease, transform 0.7s ease;
+    }
+
+    .seal::after {
+      content: "J&J";
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .letter {
+      position: absolute;
+      left: 50%;
+      bottom: 52px;
+      width: min(470px, 82vw);
+      min-height: 270px;
+      padding: 2.2rem 1.8rem;
+      transform: translateX(-50%) translateY(100px) scale(0.72);
+      background: var(--paper);
+      border: 1px solid var(--gold);
+      box-shadow: 0 18px 38px rgba(80, 55, 30, 0.18);
+      opacity: 0;
+      z-index: 3;
+      transition:
+        transform 1.3s cubic-bezier(0.19, 1, 0.22, 1),
+        opacity 0.6s ease;
+      text-align: center;
+    }
+
+    .letter-preview-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 1rem;
+    }
+
+    .letter-preview-name {
+      font-family: "Alex Brush", cursive;
+      font-size: clamp(2.4rem, 7vw, 3.6rem);
+      line-height: 1.15;
+      margin: 0.5rem 0;
+      font-weight: normal;
+      color: #6d5645;
+    }
+
+    .letter-preview-note {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .open-hint {
+      margin-top: 1.5rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .envelope-wrap.opened .envelope-flap {
+      transform: rotateX(178deg);
+      z-index: 2;
+    }
+
+    .envelope-wrap.opened .seal {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-18px) scale(0.75);
+    }
+
+    .envelope-wrap.opened .letter {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-190px) scale(1);
+      z-index: 7;
+    }
+
+    .continue-button {
+      margin-top: 4rem;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.6s ease 0.6s, transform 0.6s ease 0.6s;
+    }
+
+    .envelope-screen.ready .continue-button {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .invitation {
+      position: relative;
+      max-width: 760px;
+      margin: 1rem auto;
+      padding: 3.3rem 2.5rem;
+      background: var(--paper);
+      border: 1px solid var(--gold);
+      text-align: center;
+      box-shadow:
+        0 0 0 8px var(--paper),
+        0 0 0 9px var(--gold),
+        0 18px 45px var(--shadow);
+      overflow: hidden;
+      animation: letterUnfold 1s ease both;
+      transform-origin: top center;
+    }
+
+    .invitation::before,
+    .invitation::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border: 1px solid rgba(200, 173, 138, 0.45);
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+
+    .invitation::before {
+      top: -92px;
+      left: -92px;
+    }
+
+    .invitation::after {
+      bottom: -92px;
+      right: -92px;
+    }
+
+    .small {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 1.8rem;
+    }
+
+    .body-text {
+      font-size: 1.08rem;
+      line-height: 1.8;
+      margin: 1.4rem auto;
+    }
+
+    .line {
+      width: 55%;
+      border-top: 1px solid var(--gold);
+      margin: 1.8rem auto;
+    }
+
+    .names {
+      font-family: "Alex Brush", cursive;
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      line-height: 1.08;
+      margin: 0.3rem 0;
+      font-weight: normal;
+      color: #6d5645;
+    }
+
+    .and {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--gold-dark);
+      margin: 0.15rem 0;
+      letter-spacing: 0.08em;
+    }
+
+    .guest-area {
+      margin: 2.2rem auto 1.8rem;
+      padding: 1.5rem 1rem;
+      border: 1px dashed var(--gold);
+      background: var(--paper-soft);
+    }
+
+    .guest-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 1rem;
+    }
+
+    .guest-name {
+      display: inline-block;
+      min-width: min(300px, 80%);
+      padding: 0.45rem 0.8rem 0.35rem;
+      border-bottom: 1px solid var(--gold-dark);
+      font-size: 1.45rem;
+      font-style: italic;
+      color: #5a4636;
+      word-break: break-word;
+    }
+
+    .date {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .place {
+      font-size: 1rem;
+      color: #6b5847;
+      line-height: 1.7;
+    }
+
+    .rsvp {
+      margin-top: 2rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .guestbook-note {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: var(--paper-soft);
+      border: 1px solid #eadcc8;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .signature {
+      margin-top: 2.3rem;
+      font-style: italic;
+      text-align: right;
+      padding-right: 2rem;
+      font-size: 1.05rem;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes letterUnfold {
+      0% {
+        opacity: 0;
+        transform: translateY(28px) scaleY(0.22);
+        filter: brightness(0.96);
+      }
+
+      35% {
+        opacity: 1;
+        transform: translateY(10px) scaleY(0.62);
+        filter: brightness(0.98);
+      }
+
+      70% {
+        opacity: 1;
+        transform: translateY(0) scaleY(1.04);
+        filter: brightness(1.01);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+        filter: brightness(1);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
+        align-items: flex-start;
+        min-height: 100svh;
+      }
+
+      .page {
+        min-height: calc(100svh - 2rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .screen.active {
+        width: 100%;
+      }
+
+      .name-card {
+        margin-top: 0;
+        padding: 2rem 1.2rem;
+      }
+
+      .envelope-screen {
+        min-height: calc(100svh - 2rem);
+        padding-top: 0;
+        justify-content: center;
+      }
+
+      .envelope-wrap {
+        height: 330px;
+        margin: 0 auto;
+      }
+
+      .envelope {
+        height: 240px;
+      }
+
+      .seal {
+        top: 100px;
+        width: 50px;
+        height: 50px;
+      }
+
+      .letter {
+        bottom: 36px;
+        min-height: 250px;
+        padding: 1.8rem 1.2rem;
+      }
+
+      .envelope-wrap.opened .letter {
+        transform: translateX(-50%) translateY(-105px) scale(1);
+      }
+
+      .continue-button {
+        margin-top: 1.6rem;
+      }
+
+      .open-hint {
+        margin-top: 1rem;
+      }
+
+      .invitation {
+        padding: 2.4rem 1.4rem;
+      }
+
+      .names {
+        font-size: clamp(2.7rem, 10vw, 4rem);
+      }
+
+      .signature {
+        padding-right: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+
+    <section class="screen active" id="nameScreen">
+      <div class="name-card">
+        <p class="small-title">Attachment: Wedding Invitation</p>
+
+        <h1>Name on invitation</h1>
+
+        <p>
+          Seal the envelope, then open the letter.
+        </p>
+
+        <form id="nameForm" action="https://formspree.io/f/mqeoqwdo" method="POST">
+          <div class="input-row">
+            <input
+              id="readerName"
+              name="guest_name"
+              type="text"
+              maxlength="40"
+              placeholder="Your name"
+              autocomplete="name"
+              required
+            />
+
+            <button type="submit">Seal my invitation</button>
+          </div>
+
+          <input type="hidden" name="page" value="Jensen and Jared wedding invitation" />
+          <input type="hidden" name="message" value="A guest opened the wedding invitation." />
+
+          <p class="status-message" id="statusMessage"></p>
+        </form>
+      </div>
+    </section>
+
+    <section class="screen envelope-screen" id="envelopeScreen">
+      <p class="instruction">Your invitation has arrived. Click the envelope to open it.</p>
+
+      <div class="envelope-wrap" id="envelopeWrap" role="button" tabindex="0" aria-label="Open the envelope">
+        <div class="letter">
+          <p class="letter-preview-title">This invitation belongs to</p>
+          <h2 class="letter-preview-name" id="previewName">you</h2>
+          <p class="letter-preview-note">
+            Please unfold the letter to read Jensen’s invitation.
+          </p>
+        </div>
+
+        <div class="envelope">
+          <div class="envelope-back"></div>
+          <div class="envelope-flap"></div>
+          <div class="envelope-left"></div>
+          <div class="envelope-right"></div>
+          <div class="envelope-bottom"></div>
+          <div class="seal"></div>
+        </div>
+      </div>
+
+      <button class="continue-button" id="continueButton" type="button">
+        Read the invitation
+      </button>
+
+      <p class="open-hint">The envelope is sealed with J&amp;J.</p>
+    </section>
+
+    <section class="screen" id="invitationScreen">
+      <article class="invitation" aria-label="Wedding invitation">
+
+        <div class="line"></div>
+
+        <p class="names">Jensen Ackles</p>
+        <p class="and">and</p>
+        <p class="names">Jared Padalecki</p>
+
+        <div class="line"></div>
+
+        <p class="body-text">
+          request the honor of your presence<br />
+          as they are married<br />
+          
+        </p>
+
+        <div class="guest-area">
+          <p class="guest-label">This invitation belongs to</p>
+          <p class="guest-name" id="guestName">the one who stayed to witness us</p>
+        </div>
+
+        <p class="date">
+          Thursday, Sep 10th, 2020
+        </p>
+
+        <p class="place">
+          Montauk Point Lighthouse<br />
+          Long Island, NY
+        </p>
+
+        <div class="line"></div>
+
+        <p class="guestbook-note" id="guestbookNote">
+          Your name has been written into the guest book.
+        </p>
+
+        <p class="signature">
+          With love,<br />
+          Jensen & Jared
+        </p>
+
+      </article>
+
+      <p class="footer-note">
+        This invitation was written for everyone who witnessed the story.
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    const nameScreen = document.getElementById("nameScreen");
+    const envelopeScreen = document.getElementById("envelopeScreen");
+    const invitationScreen = document.getElementById("invitationScreen");
+
+    const form = document.getElementById("nameForm");
+    const readerNameInput = document.getElementById("readerName");
+    const statusMessage = document.getElementById("statusMessage");
+
+    const previewName = document.getElementById("previewName");
+    const guestName = document.getElementById("guestName");
+    const guestbookNote = document.getElementById("guestbookNote");
+
+    const envelopeWrap = document.getElementById("envelopeWrap");
+    const continueButton = document.getElementById("continueButton");
+
+    function showScreen(screen) {
+      nameScreen.classList.remove("active");
+      envelopeScreen.classList.remove("active");
+      invitationScreen.classList.remove("active");
+
+      screen.classList.add("active");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+
+    function cleanName(name) {
+      return name.replace(/\s+/g, " ").trim();
+    }
+
+    async function submitToGuestbook() {
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: formData,
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const name = cleanName(readerNameInput.value);
+
+      if (!name) {
+        statusMessage.textContent = "Please write a name first.";
+        return;
+      }
+
+      previewName.textContent = name;
+      guestName.textContent = name;
+
+      statusMessage.textContent = "Sealing your invitation...";
+
+      const guestbookUpdated = await submitToGuestbook();
+
+      if (guestbookUpdated) {
+        guestbookNote.textContent = name + " has been written into the guest book.";
+      } else {
+        guestbookNote.textContent = name + " is written on this invitation. The guest book may not have updated.";
+      }
+
+      showScreen(envelopeScreen);
+    });
+
+    function openEnvelope() {
+      if (envelopeWrap.classList.contains("opened")) {
+        return;
+      }
+
+      envelopeWrap.classList.add("opened");
+
+      setTimeout(function() {
+        envelopeScreen.classList.add("ready");
+      }, 900);
+    }
+
+    envelopeWrap.addEventListener("click", openEnvelope);
+
+    envelopeWrap.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openEnvelope();
+      }
+    });
+
+    continueButton.addEventListener("click", function() {
+      showScreen(invitationScreen);
+    });
+  </script>
+</body>
+</html>
